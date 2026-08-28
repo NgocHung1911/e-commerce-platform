@@ -1,6 +1,10 @@
 <?php
 /**
- * Sub-module Quản lý Giỏ hàng & Form Thanh Toán VietQR SePay
+ * Plugin Name: Quản lý Giỏ hàng & VietQR SePay (Cart Manager)
+ * Plugin URI: https://example.com/
+ * Description: Plugin quản lý Giỏ hàng, Đặt hàng và Thanh toán SePay VietQR Tự động.
+ * Version: 1.0.0
+ * Author: Antigravity
  */
 
 if (!defined('ABSPATH')) {

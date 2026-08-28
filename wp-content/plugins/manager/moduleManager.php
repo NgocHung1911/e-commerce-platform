@@ -1,6 +1,10 @@
 <?php
 /**
- * Module Manager
+ * Plugin Name: Trình Quản Lý Module E-Commerce (Module Manager)
+ * Plugin URI: https://example.com/
+ * Description: Plugin Trình quản lý trung tâm tự động phát hiện và nạp tất cả các Sub-module hệ thống.
+ * Version: 1.0.0
+ * Author: Antigravity
  */
 
 if (!defined('ABSPATH')) {
