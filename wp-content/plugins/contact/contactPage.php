@@ -1,11 +1,14 @@
 <?php
 /**
- * Sub-module Trang Liên Hệ (Contact Us Page)
- * File: contactPage.php (Module Plugin Contact)
+ * Plugin Name: Trang Liên Hệ & Google Maps (Contact Manager)
+ * Plugin URI: https://example.com/
+ * Description: Plugin quản lý Trang Liên Hệ, bản đồ Google Maps ghim vị trí và form liên hệ nhanh.
+ * Version: 1.0.0
+ * Author: Antigravity
  */
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
+    exit;
 }
 
 if (!function_exists('cpm_render_contact_page_shortcode')) {

@@ -1,11 +1,14 @@
 <?php
 /**
- * Component Card Sản Phẩm Tái Sử Dụng (Reusable Product Card Component)
- * File: productCard.php (Module Plugin Component)
+ * Plugin Name: Component Card Sản Phẩm (Product Card Component)
+ * Plugin URI: https://example.com/
+ * Description: Plugin quản lý mẫu giao diện Thẻ sản phẩm (Product Card) dùng chung cho toàn bộ hệ thống.
+ * Version: 1.0.0
+ * Author: Antigravity
  */
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
+    exit;
 }
 
 if (function_exists('cpm_render_product_card')) {

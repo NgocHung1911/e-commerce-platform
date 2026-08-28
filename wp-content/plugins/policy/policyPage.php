@@ -1,11 +1,14 @@
 <?php
 /**
- * Sub-module Trang Chính Sách Hệ Thống (System Policy Page)
- * File: policyPage.php
+ * Plugin Name: Trang Chính Sách Hệ Thống (Policy Manager)
+ * Plugin URI: https://example.com/
+ * Description: Plugin quản lý các Trang Chính sách hệ thống, Điều khoản dịch vụ và Chính sách bảo mật.
+ * Version: 1.0.0
+ * Author: Antigravity
  */
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
+    exit;
 }
 
 if (!function_exists('cpm_render_policy_page_shortcode')) {
