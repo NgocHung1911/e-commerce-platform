@@ -1,0 +1,19 @@
+h3.accordion-section-title a {
+    color: #00308D !important;
+    background-color: #EFF4F7 !important;
+    border: #EFF4F7 !important;
+}
+
+h3.accordion-section-title.premium-details {
+    background: #00308D !important;
+    color: #fff !important;
+}
+h3.accordion-section-title.premium-details::after {
+    display: none !important;
+}
+h3.accordion-section-title.premium-details {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: space-between;
+}

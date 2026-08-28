@@ -1,0 +1,24 @@
+# Ignore WordPress upload files & media backups if any
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/backups/
+wp-content/cache/
+
+# Ignore OS & IDE files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+# Ignore log & temp files
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Node modules / vendor if any
+node_modules/
+vendor/
