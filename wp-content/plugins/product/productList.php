@@ -38,6 +38,12 @@ function cpm_enqueue_tailwind_cdn() {
             box-sizing: border-box !important;
         }
 
+        .cpm-products-grid > * {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
         @media (max-width: 1024px) {
             .cpm-products-grid {
                 grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -151,12 +157,6 @@ add_action('wp_head', 'cpm_enqueue_tailwind_cdn');
  * Shortcode hiển thị danh sách sản phẩm có Phân Trang (Mặc định 12 sản phẩm / trang)
  */
 function cpm_products_shortcode($atts) {
-    static $already_rendered = false;
-    if ($already_rendered && !is_admin() && !defined('REST_REQUEST')) {
-        return '';
-    }
-    $already_rendered = true;
-
     $atts = shortcode_atts(array(
         'posts_per_page' => 12,
         'columns'        => 4,
@@ -165,22 +165,54 @@ function cpm_products_shortcode($atts) {
     ), $atts, 'danh_sach_san_pham');
 
     $paged = (get_query_var('paged')) ? get_query_var('paged') : ((get_query_var('page')) ? get_query_var('page') : 1);
+    $search_term = isset($_GET['search_kw']) ? sanitize_text_field($_GET['search_kw']) : (get_search_query() ? get_search_query() : (isset($_GET['s']) ? sanitize_text_field($_GET['s']) : ''));
+    $sort_by = isset($_GET['orderby']) ? sanitize_text_field($_GET['orderby']) : $atts['orderby'];
 
     $args = array(
         'post_type'      => array('custom_product', 'product'),
         'posts_per_page' => intval($atts['posts_per_page']),
         'paged'          => $paged,
-        'orderby'        => sanitize_text_field($atts['orderby']),
-        'order'          => sanitize_text_field($atts['order']),
         'post_status'    => 'publish'
     );
+
+    switch ($sort_by) {
+        case 'price_asc':
+            $args['meta_key'] = '_product_price';
+            $args['orderby'] = 'meta_value_num';
+            $args['order'] = 'ASC';
+            break;
+        case 'price_desc':
+            $args['meta_key'] = '_product_price';
+            $args['orderby'] = 'meta_value_num';
+            $args['order'] = 'DESC';
+            break;
+        case 'date_asc':
+            $args['orderby'] = 'date';
+            $args['order'] = 'ASC';
+            break;
+        case 'title_asc':
+            $args['orderby'] = 'title';
+            $args['order'] = 'ASC';
+            break;
+        default:
+            $args['orderby'] = 'date';
+            $args['order'] = 'DESC';
+            break;
+    }
+
+    if (!empty($search_term)) {
+        $args['s'] = $search_term;
+    }
 
     $query = new WP_Query($args);
 
     ob_start();
-    ?>
-
-    <div class="max-w-[1200px] mx-auto my-8 px-4 font-sans box-border">
+    $theme_template = locate_template('template-parts/cpm/product-list.php');
+    if ($theme_template) {
+        include $theme_template;
+    } else {
+        ?>
+        <div class="max-w-[1200px] mx-auto my-8 px-4 font-sans box-border">
         <?php if ($query->have_posts()) : ?>
             <!-- Lưới Sản Phẩm Căn Giữa Chuẩn Layout -->
             <div class="cpm-products-grid">
@@ -238,6 +270,7 @@ function cpm_products_shortcode($atts) {
         <?php endif; ?>
     </div>
     <?php
+    } // end theme fallback
     return ob_get_clean();
 }
 
@@ -256,3 +289,108 @@ add_filter('excerpt_more', function($more) {
     }
     return $more;
 }, 999);
+
+/**
+ * AJAX Handler Lọc & Tìm Kiếm Sản Phẩm Tức Thì Không Cần Load Lại Trang
+ */
+function cpm_ajax_filter_products_handler() {
+    $search_term = isset($_POST['search_kw']) ? sanitize_text_field($_POST['search_kw']) : '';
+    $sort_by = isset($_POST['orderby']) ? sanitize_text_field($_POST['orderby']) : 'date_desc';
+    $paged = isset($_POST['paged']) ? intval($_POST['paged']) : 1;
+
+    $args = array(
+        'post_type'      => array('custom_product', 'product'),
+        'posts_per_page' => 12,
+        'paged'          => $paged,
+        'post_status'    => 'publish'
+    );
+
+    switch ($sort_by) {
+        case 'price_asc':
+            $args['meta_key'] = '_product_price';
+            $args['orderby'] = 'meta_value_num';
+            $args['order'] = 'ASC';
+            break;
+        case 'price_desc':
+            $args['meta_key'] = '_product_price';
+            $args['orderby'] = 'meta_value_num';
+            $args['order'] = 'DESC';
+            break;
+        case 'date_asc':
+            $args['orderby'] = 'date';
+            $args['order'] = 'ASC';
+            break;
+        case 'title_asc':
+            $args['orderby'] = 'title';
+            $args['order'] = 'ASC';
+            break;
+        default:
+            $args['orderby'] = 'date';
+            $args['order'] = 'DESC';
+            break;
+    }
+
+    if (!empty($search_term)) {
+        $args['s'] = $search_term;
+    }
+
+    $query = new WP_Query($args);
+
+    ob_start();
+    if ($query->have_posts()) {
+        echo '<div class="cpm-products-grid text-left">';
+        while ($query->have_posts()) {
+            $query->the_post();
+            echo cpm_render_product_card(get_the_ID());
+        }
+        echo '</div>';
+
+        if ($query->max_num_pages > 1) {
+            echo '<div class="cpm-pagination flex items-center justify-center gap-2 mt-10 mb-6 w-full flex-wrap">';
+            $big = 999999999;
+            $pagination_links = paginate_links(array(
+                'base'      => str_replace($big, '%#%', esc_url(get_pagenum_link($big))),
+                'format'    => '?paged=%#%',
+                'current'   => max(1, $paged),
+                'total'     => $query->max_num_pages,
+                'prev_text' => '← Trang trước',
+                'next_text' => 'Trang sau →',
+                'type'      => 'array',
+                'mid_size'  => 2
+            ));
+
+            if (!empty($pagination_links)) {
+                foreach ($pagination_links as $link) {
+                    if (strpos($link, 'current') !== false) {
+                        echo str_replace('class="page-numbers current"', 'class="cpm-pagination-link active"', $link);
+                    } else {
+                        echo str_replace('class="page-numbers', 'class="cpm-pagination-link inactive', $link);
+                    }
+                }
+            }
+            echo '</div>';
+        }
+        wp_reset_postdata();
+    } else {
+        ?>
+        <div class="bg-white rounded-3xl p-10 md:p-14 text-center border border-slate-200 shadow-sm max-w-lg mx-auto my-6">
+            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🔍</div>
+            <h3 class="text-xl font-extrabold text-slate-900 mb-2">Không tìm thấy sản phẩm nào</h3>
+            <p class="text-sm text-slate-500 mb-6">
+                Rất tiếc, không tìm thấy sản phẩm nào phù hợp với từ khóa "<strong><?php echo esc_html($search_term); ?></strong>".
+            </p>
+            <button type="button" onclick="resetCpmAjaxFilter()" class="inline-block px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg border-none cursor-pointer">
+                🛍️ Xem tất cả sản phẩm
+            </button>
+        </div>
+        <?php
+    }
+    $html = ob_get_clean();
+
+    wp_send_json_success(array(
+        'html' => $html,
+        'count' => $query->found_posts
+    ));
+}
+add_action('wp_ajax_cpm_filter_products', 'cpm_ajax_filter_products_handler');
+add_action('wp_ajax_nopriv_cpm_filter_products', 'cpm_ajax_filter_products_handler');

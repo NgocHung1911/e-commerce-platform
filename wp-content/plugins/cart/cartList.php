@@ -7,7 +7,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function cpm_cart_and_orders_install_tables() {
+function cpm_cart_and_orders_install_tables()
+{
     global $wpdb;
     $table_cart = $wpdb->prefix . 'cpm_cart';
     $table_orders = $wpdb->prefix . 'cpm_orders';
@@ -64,16 +65,17 @@ cpm_cart_and_orders_install_tables();
 /**
  * 2. Tự động khởi tạo Trang "Giỏ hàng" (/gio-hang/)
  */
-function cpm_cart_create_pages() {
+function cpm_cart_create_pages()
+{
     if (get_option('cpm_cart_pages_created_v9') !== 'yes') {
         $cart_slug = 'gio-hang';
         if (!get_page_by_path($cart_slug)) {
             wp_insert_post(array(
-                'post_title'   => 'Giỏ hàng',
+                'post_title' => 'Giỏ hàng',
                 'post_content' => '<!-- wp:shortcode -->[cpm_cart]<!-- /wp:shortcode -->',
-                'post_status'  => 'publish',
-                'post_type'    => 'page',
-                'post_name'    => $cart_slug
+                'post_status' => 'publish',
+                'post_type' => 'page',
+                'post_name' => $cart_slug
             ));
         }
         update_option('cpm_cart_pages_created_v9', 'yes');
@@ -84,7 +86,8 @@ add_action('init', 'cpm_cart_create_pages');
 /**
  * 3. SePay Webhook Listener (Dành cho Server thường hoặc Ngrok)
  */
-function cpm_sepay_webhook_listener() {
+function cpm_sepay_webhook_listener()
+{
     if (isset($_GET['cpm_sepay_webhook']) || (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'cpm-sepay-webhook') !== false)) {
         $json_data = file_get_contents('php://input');
         $data = json_decode($json_data, true);
@@ -131,7 +134,8 @@ add_action('wp_ajax_nopriv_cpm_sepay_webhook', 'cpm_sepay_webhook_listener');
 /**
  * 4. AJAX Handler: Đánh dấu đơn hàng đã thanh toán (Gọi từ nút "Tôi đã thanh toán")
  */
-function cpm_ajax_mark_order_paid_handler() {
+function cpm_ajax_mark_order_paid_handler()
+{
     $order_code = isset($_GET['order_code']) ? sanitize_text_field($_GET['order_code']) : '';
     if (empty($order_code)) {
         wp_send_json_error(array('message' => 'Mã đơn hàng không hợp lệ.'));
@@ -161,7 +165,8 @@ add_action('wp_ajax_nopriv_cpm_mark_order_paid', 'cpm_ajax_mark_order_paid_handl
 /**
  * 4.5. AJAX Handler: Kiểm tra trạng thái thanh toán đơn hàng
  */
-function cpm_ajax_check_payment_status_handler() {
+function cpm_ajax_check_payment_status_handler()
+{
     $order_code = isset($_GET['order_code']) ? sanitize_text_field($_GET['order_code']) : '';
     $force_check = isset($_GET['force_check']) ? intval($_GET['force_check']) : 0;
 
@@ -194,7 +199,8 @@ add_action('wp_ajax_nopriv_cpm_check_payment_status', 'cpm_ajax_check_payment_st
 /**
  * 5. Lưu Cấu Hình SePay API Token trong WP Admin / Settings
  */
-function cpm_save_sepay_token_option() {
+function cpm_save_sepay_token_option()
+{
     if (isset($_POST['cpm_save_sepay_token_nonce']) && wp_verify_nonce($_POST['cpm_save_sepay_token_nonce'], 'cpm_save_sepay_token_action')) {
         if (isset($_POST['cpm_sepay_api_token'])) {
             $token = sanitize_text_field($_POST['cpm_sepay_api_token']);
@@ -207,7 +213,8 @@ add_action('admin_init', 'cpm_save_sepay_token_option');
 /**
  * 6. Thêm Menu "Cấu hình SePay" trong WP Admin
  */
-function cpm_add_sepay_admin_menu() {
+function cpm_add_sepay_admin_menu()
+{
     add_options_page(
         'Cấu hình SePay API Token',
         'Cấu hình SePay',
@@ -218,16 +225,20 @@ function cpm_add_sepay_admin_menu() {
 }
 add_action('admin_menu', 'cpm_add_sepay_admin_menu');
 
-function cpm_render_sepay_admin_page() {
+function cpm_render_sepay_admin_page()
+{
     $current_token = get_option('cpm_sepay_api_token', '');
     ?>
-    <div class="wrap" style="max-width: 800px; background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #ccd0d4; margin-top: 20px;">
+    <div class="wrap"
+        style="max-width: 800px; background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #ccd0d4; margin-top: 20px;">
         <h2>⚙️ Cấu hình API Token SePay.vn</h2>
-        <p>Để vượt qua tường lửa chống Robot của Hosting miễn phí (InfinityFree/iFastNet Firewall), bạn chỉ cần dán mã API Token SePay vào đây:</p>
-        
-        <?php if (isset($_POST['cpm_sepay_api_token'])) : ?>
+        <p>Để vượt qua tường lửa chống Robot của Hosting miễn phí (InfinityFree/iFastNet Firewall), bạn chỉ cần dán mã API
+            Token SePay vào đây:</p>
+
+        <?php if (isset($_POST['cpm_sepay_api_token'])): ?>
             <div class="notice notice-success is-dismissible" style="padding: 10px; margin-bottom: 15px;">
-                <p><strong>✅ Đã lưu SePay API Token thành công!</strong> Hệ thống sẽ tự động quét thông tin chuyển khoản từ SePay.</p>
+                <p><strong>✅ Đã lưu SePay API Token thành công!</strong> Hệ thống sẽ tự động quét thông tin chuyển khoản từ
+                    SePay.</p>
             </div>
         <?php endif; ?>
 
@@ -237,8 +248,11 @@ function cpm_render_sepay_admin_page() {
                 <tr>
                     <th scope="row"><label for="cpm_sepay_api_token">SePay API Token / Key:</label></th>
                     <td>
-                        <input type="text" id="cpm_sepay_api_token" name="cpm_sepay_api_token" value="<?php echo esc_attr($current_token); ?>" class="regular-text" style="width: 100%;" placeholder="SPTOKEN_xxxxxxxxxxxxxxxxx" />
-                        <p class="description">Lấy mã API Token tại: <a href="https://my.sepay.vn/user/api-key" target="_blank">https://my.sepay.vn/user/api-key</a></p>
+                        <input type="text" id="cpm_sepay_api_token" name="cpm_sepay_api_token"
+                            value="<?php echo esc_attr($current_token); ?>" class="regular-text" style="width: 100%;"
+                            placeholder="SPTOKEN_xxxxxxxxxxxxxxxxx" />
+                        <p class="description">Lấy mã API Token tại: <a href="https://my.sepay.vn/user/api-key"
+                                target="_blank">https://my.sepay.vn/user/api-key</a></p>
                     </td>
                 </tr>
             </table>
@@ -251,7 +265,8 @@ function cpm_render_sepay_admin_page() {
 /**
  * 7. Nạp Scripts cho Giỏ Hàng & Thanh Toán
  */
-function cpm_cart_enqueue_scripts() {
+function cpm_cart_enqueue_scripts()
+{
     if (!wp_script_is('tailwind-cdn', 'enqueued')) {
         wp_enqueue_script('tailwind-cdn', 'https://cdn.tailwindcss.com', array(), '3.4.1', false);
     }
@@ -261,7 +276,8 @@ add_action('wp_enqueue_scripts', 'cpm_cart_enqueue_scripts');
 /**
  * 8. AJAX Handler: Thêm sản phẩm vào giỏ (wp_ajax_cpm_add_to_cart)
  */
-function cpm_ajax_add_to_cart_handler() {
+function cpm_ajax_add_to_cart_handler()
+{
     check_ajax_referer('cpm_cart_nonce', 'security');
 
     if (!is_user_logged_in()) {
@@ -336,7 +352,8 @@ add_action('wp_ajax_nopriv_cpm_add_to_cart', 'cpm_ajax_add_to_cart_handler');
 /**
  * 9. AJAX Handler: Cập nhật số lượng sản phẩm (update_cart)
  */
-function cpm_ajax_update_cart_handler() {
+function cpm_ajax_update_cart_handler()
+{
     check_ajax_referer('cpm_cart_nonce', 'security');
 
     if (!is_user_logged_in()) {
@@ -413,7 +430,8 @@ add_action('wp_ajax_cpm_update_cart', 'cpm_ajax_update_cart_handler');
 /**
  * 10. AJAX Handler: Xóa sản phẩm khỏi giỏ (remove_from_cart)
  */
-function cpm_ajax_remove_from_cart_handler() {
+function cpm_ajax_remove_from_cart_handler()
+{
     check_ajax_referer('cpm_cart_nonce', 'security');
 
     if (!is_user_logged_in()) {
@@ -465,7 +483,8 @@ add_action('wp_ajax_cpm_remove_from_cart', 'cpm_ajax_remove_from_cart_handler');
 /**
  * 11. AJAX Handler: Tạo Đơn Hàng & Chuẩn bị Mã QR VietQR SePay
  */
-function cpm_ajax_checkout_handler() {
+function cpm_ajax_checkout_handler()
+{
     check_ajax_referer('cpm_cart_nonce', 'security');
 
     if (!is_user_logged_in()) {
@@ -621,8 +640,10 @@ add_action('wp_ajax_cpm_checkout', 'cpm_ajax_checkout_handler');
 /**
  * 12. Hiển thị Toast, Modal Xác Nhận Xóa, Floating Widgets & Modal SePay VietQR ở Footer
  */
-function cpm_render_cart_footer_widgets() {
-    if (is_admin()) return;
+function cpm_render_cart_footer_widgets()
+{
+    if (is_admin())
+        return;
 
     $nonce = wp_create_nonce('cpm_cart_nonce');
     $ajax_url = admin_url('admin-ajax.php');
@@ -642,34 +663,44 @@ function cpm_render_cart_footer_widgets() {
     $cart_count = intval($cart_count);
     ?>
     <!-- Toast Notification Container -->
-    <div id="cpm-toast-container" class="fixed top-5 right-5 z-[999999] flex flex-col gap-3 pointer-events-none font-sans"></div>
+    <div id="cpm-toast-container" class="fixed top-5 right-5 z-[999999] flex flex-col gap-3 pointer-events-none font-sans">
+    </div>
 
     <!-- Floating Cart Button -->
-    <a href="<?php echo esc_url($cart_url); ?>" id="cpm-floating-cart-btn" class="fixed bottom-6 right-6 z-[9999] flex items-center gap-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs md:text-sm px-4 py-3 rounded-full shadow-2xl hover:scale-105 transition-all duration-200 no-underline border border-white/20">
+    <a href="<?php echo esc_url($cart_url); ?>" id="cpm-floating-cart-btn"
+        class="fixed bottom-6 right-6 z-[9999] flex items-center gap-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs md:text-sm px-4 py-3 rounded-full shadow-2xl hover:scale-105 transition-all duration-200 no-underline border border-white/20">
         <span class="text-base md:text-lg">🛒</span>
         <span>Giỏ hàng</span>
-        <span id="cpm-cart-badge-count" class="bg-red-500 text-white text-xs font-black px-2 py-0.5 rounded-full min-w-[20px] text-center shadow-inner">
+        <span id="cpm-cart-badge-count"
+            class="bg-red-500 text-white text-xs font-black px-2 py-0.5 rounded-full min-w-[20px] text-center shadow-inner">
             <?php echo $cart_count; ?>
         </span>
     </a>
 
     <!-- Modal Xác Nhận Xóa Sản Phẩm Custom -->
-    <div id="cpmDeleteConfirmModal" style="display: none;" class="fixed inset-0 z-[999999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fadeIn font-sans">
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-slate-100 p-6 text-center transform transition-all relative">
-            <button type="button" onclick="closeCpmDeleteConfirmModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors border-none cursor-pointer">
+    <div id="cpmDeleteConfirmModal" style="display: none;"
+        class="fixed inset-0 z-[999999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fadeIn font-sans">
+        <div
+            class="bg-white w-full max-w-sm rounded-2xl shadow-2xl border border-slate-100 p-6 text-center transform transition-all relative">
+            <button type="button" onclick="closeCpmDeleteConfirmModal()"
+                class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors border-none cursor-pointer">
                 ✕
             </button>
-            <div class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+            <div
+                class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
                 🗑️
             </div>
             <h3 class="text-lg font-black text-slate-900 mb-2">Xóa khỏi giỏ hàng?</h3>
-            <p class="text-xs md:text-sm text-slate-500 mb-6">Bạn có chắc chắn muốn xóa sản phẩm này ra khỏi giỏ hàng của mình không?</p>
-            
+            <p class="text-xs md:text-sm text-slate-500 mb-6">Bạn có chắc chắn muốn xóa sản phẩm này ra khỏi giỏ hàng của
+                mình không?</p>
+
             <div class="flex items-center gap-3">
-                <button type="button" onclick="closeCpmDeleteConfirmModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs md:text-sm rounded-xl transition-all border-none cursor-pointer">
+                <button type="button" onclick="closeCpmDeleteConfirmModal()"
+                    class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs md:text-sm rounded-xl transition-all border-none cursor-pointer">
                     Hủy bỏ
                 </button>
-                <button type="button" onclick="executeCpmDeleteCartItem()" class="flex-1 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold text-xs md:text-sm rounded-xl shadow-md hover:shadow-lg transition-all border-none cursor-pointer">
+                <button type="button" onclick="executeCpmDeleteCartItem()"
+                    class="flex-1 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold text-xs md:text-sm rounded-xl shadow-md hover:shadow-lg transition-all border-none cursor-pointer">
                     Đồng ý xóa
                 </button>
             </div>
@@ -677,29 +708,35 @@ function cpm_render_cart_footer_widgets() {
     </div>
 
     <!-- Modal Popup Quét Mã QR SePay / VietQR Tự Động Xác Nhận -->
-    <div id="cpmVietQRModal" style="display: none;" class="fixed inset-0 z-[999999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fadeIn font-sans">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden relative transform transition-all">
+    <div id="cpmVietQRModal" style="display: none;"
+        class="fixed inset-0 z-[999999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fadeIn font-sans">
+        <div
+            class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden relative transform transition-all">
             <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <span class="text-xl">📲</span>
                     <div>
                         <h3 class="text-base font-black leading-tight">Thanh toán SePay VietQR Tự Động</h3>
-                        <p class="text-[11px] opacity-90">Mã đơn hàng: <span id="cpmQrOrderCode" class="font-mono font-bold uppercase underline"></span></p>
+                        <p class="text-[11px] opacity-90">Mã đơn hàng: <span id="cpmQrOrderCode"
+                                class="font-mono font-bold uppercase underline"></span></p>
                     </div>
                 </div>
-                <button type="button" onclick="closeCpmVietQRModal()" class="text-white/80 hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors border-none cursor-pointer">
+                <button type="button" onclick="closeCpmVietQRModal()"
+                    class="text-white/80 hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors border-none cursor-pointer">
                     ✕
                 </button>
             </div>
 
             <div class="p-6 text-center">
-                <div id="cpmSepayStatusBox" class="flex items-center justify-center gap-2 py-2 px-3 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold border border-blue-100 mb-3 animate-pulse">
+                <div id="cpmSepayStatusBox"
+                    class="flex items-center justify-center gap-2 py-2 px-3 bg-blue-50 text-blue-700 rounded-xl text-xs font-bold border border-blue-100 mb-3 animate-pulse">
                     <span class="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
                     <span>SePay đang tự động chờ chuyển khoản ngân hàng...</span>
                 </div>
 
                 <div class="inline-block p-3 bg-white rounded-2xl border-2 border-dashed border-blue-200 shadow-md mb-4">
-                    <img id="cpmQrImage" src="" alt="Mã QR VietQR Thanh Toán" class="w-60 h-60 object-contain mx-auto rounded-lg" />
+                    <img id="cpmQrImage" src="" alt="Mã QR VietQR Thanh Toán"
+                        class="w-60 h-60 object-contain mx-auto rounded-lg" />
                 </div>
 
                 <div class="bg-slate-50 rounded-xl p-4 text-left space-y-2 text-xs border border-slate-200 mb-2">
@@ -725,7 +762,8 @@ function cpm_render_cart_footer_widgets() {
                     </div>
                 </div>
 
-                <button type="button" onclick="cpmManualCheckPayment()" class="w-full mt-3 py-3.5 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs md:text-sm rounded-xl shadow-lg border-none cursor-pointer flex items-center justify-center gap-2 transition-all">
+                <button type="button" onclick="cpmManualCheckPayment()"
+                    class="w-full mt-3 py-3.5 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs md:text-sm rounded-xl shadow-lg border-none cursor-pointer flex items-center justify-center gap-2 transition-all">
                     <span>✅ Tôi đã thanh toán (Xem hóa đơn ngay)</span>
                 </button>
             </div>
@@ -734,16 +772,19 @@ function cpm_render_cart_footer_widgets() {
 
     <!-- Global JavaScript Helper -->
     <script>
-        const cpmCartGlobalAjaxUrl = "<?php echo esc_url($ajax_url); ?>";
-        const cpmCartGlobalNonce = "<?php echo esc_js($nonce); ?>";
-        const cpmSepayToken = "<?php echo esc_js(trim(get_option('cpm_sepay_api_token', ''))); ?>";
+        window.cpmCartGlobalAjaxUrl = window.cpmCartGlobalAjaxUrl || "<?php echo esc_url($ajax_url); ?>";
+        window.cpmCartGlobalNonce = window.cpmCartGlobalNonce || "<?php echo esc_js($nonce); ?>";
+        window.cpmSepayToken = window.cpmSepayToken || "<?php echo esc_js(trim(get_option('cpm_sepay_api_token', ''))); ?>";
+        var cpmCartGlobalAjaxUrl = window.cpmCartGlobalAjaxUrl;
+        var cpmCartGlobalNonce = window.cpmCartGlobalNonce;
+        var cpmSepayToken = window.cpmSepayToken;
 
         let pendingCartIdToDelete = null;
         let cpmRedirectInvoiceUrl = "";
         let cpmCurrentOrderCode = "";
         let cpmPaymentPollingInterval = null;
 
-        window.cpmManualCheckPayment = function() {
+        window.cpmManualCheckPayment = function () {
             if (!cpmCurrentOrderCode) return;
             if (cpmPaymentPollingInterval) {
                 clearInterval(cpmPaymentPollingInterval);
@@ -754,25 +795,25 @@ function cpm_render_cart_footer_widgets() {
             }
 
             fetch(cpmCartGlobalAjaxUrl + '?action=cpm_mark_order_paid&order_code=' + encodeURIComponent(cpmCurrentOrderCode))
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    if (typeof cpmShowToast === 'function') {
-                        cpmShowToast('🎉 Xác nhận thanh toán thành công! Đang chuyển đến Hóa đơn...', 'success');
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        if (typeof cpmShowToast === 'function') {
+                            cpmShowToast('🎉 Xác nhận thanh toán thành công! Đang chuyển đến Hóa đơn...', 'success');
+                        }
+                        setTimeout(() => {
+                            window.location.href = res.data.invoice_url || cpmRedirectInvoiceUrl;
+                        }, 500);
+                    } else {
+                        window.location.href = cpmRedirectInvoiceUrl;
                     }
-                    setTimeout(() => {
-                        window.location.href = res.data.invoice_url || cpmRedirectInvoiceUrl;
-                    }, 500);
-                } else {
+                })
+                .catch(err => {
                     window.location.href = cpmRedirectInvoiceUrl;
-                }
-            })
-            .catch(err => {
-                window.location.href = cpmRedirectInvoiceUrl;
-            });
+                });
         };
 
-        window.cpmRemoveCartItem = function(cartId) {
+        window.cpmRemoveCartItem = function (cartId) {
             pendingCartIdToDelete = cartId;
             const modal = document.getElementById('cpmDeleteConfirmModal');
             if (modal) {
@@ -780,7 +821,7 @@ function cpm_render_cart_footer_widgets() {
             }
         };
 
-        window.closeCpmDeleteConfirmModal = function() {
+        window.closeCpmDeleteConfirmModal = function () {
             pendingCartIdToDelete = null;
             const modal = document.getElementById('cpmDeleteConfirmModal');
             if (modal) {
@@ -788,7 +829,7 @@ function cpm_render_cart_footer_widgets() {
             }
         };
 
-        window.executeCpmDeleteCartItem = function() {
+        window.executeCpmDeleteCartItem = function () {
             if (!pendingCartIdToDelete) return;
             const cartId = pendingCartIdToDelete;
             closeCpmDeleteConfirmModal();
@@ -802,30 +843,30 @@ function cpm_render_cart_footer_widgets() {
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    const row = document.getElementById('cpm-cart-row-' + cartId);
-                    if (row) row.remove();
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        const row = document.getElementById('cpm-cart-row-' + cartId);
+                        if (row) row.remove();
 
-                    if (res.data.is_empty) {
-                        cpmRenderEmptyCartUI();
+                        if (res.data.is_empty) {
+                            cpmRenderEmptyCartUI();
+                        } else {
+                            cpmUpdateCartDOMTotals(res.data);
+                        }
+
+                        if (typeof cpmShowToast === 'function') {
+                            cpmShowToast(res.data.message, 'success');
+                        }
                     } else {
-                        cpmUpdateCartDOMTotals(res.data);
+                        if (typeof cpmShowToast === 'function') {
+                            cpmShowToast(res.data.message || 'Lỗi xóa sản phẩm!', 'error');
+                        }
                     }
-
-                    if (typeof cpmShowToast === 'function') {
-                        cpmShowToast(res.data.message, 'success');
-                    }
-                } else {
-                    if (typeof cpmShowToast === 'function') {
-                        cpmShowToast(res.data.message || 'Lỗi xóa sản phẩm!', 'error');
-                    }
-                }
-            });
+                });
         };
 
-        window.closeCpmVietQRModal = function() {
+        window.closeCpmVietQRModal = function () {
             if (cpmPaymentPollingInterval) {
                 clearInterval(cpmPaymentPollingInterval);
             }
@@ -833,7 +874,7 @@ function cpm_render_cart_footer_widgets() {
             if (modal) modal.style.display = 'none';
         };
 
-        window.cpmStartSepayPolling = function(orderCode, invoiceUrl) {
+        window.cpmStartSepayPolling = function (orderCode, invoiceUrl) {
             cpmCurrentOrderCode = orderCode;
             cpmRedirectInvoiceUrl = invoiceUrl;
 
@@ -843,31 +884,30 @@ function cpm_render_cart_footer_widgets() {
 
             cpmPaymentPollingInterval = setInterval(() => {
                 fetch(cpmCartGlobalAjaxUrl + '?action=cpm_check_payment_status&order_code=' + encodeURIComponent(orderCode))
-                .then(res => res.json())
-                .then(res => {
-                    if (res.success && res.data.is_paid) {
-                        clearInterval(cpmPaymentPollingInterval);
-                        if (typeof cpmShowToast === 'function') {
-                            cpmShowToast('🎉 SePay báo nhận tiền thành công! Đang chuyển đến Hóa đơn...', 'success');
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.success && res.data.is_paid) {
+                            clearInterval(cpmPaymentPollingInterval);
+                            if (typeof cpmShowToast === 'function') {
+                                cpmShowToast('🎉 SePay báo nhận tiền thành công! Đang chuyển đến Hóa đơn...', 'success');
+                            }
+                            setTimeout(() => {
+                                window.location.href = res.data.invoice_url || invoiceUrl;
+                            }, 500);
                         }
-                        setTimeout(() => {
-                            window.location.href = res.data.invoice_url || invoiceUrl;
-                        }, 500);
-                    }
-                })
-                .catch(err => {});
+                    })
+                    .catch(err => { });
             }, 3000);
         };
 
-        window.cpmShowToast = function(message, type = 'success') {
+        window.cpmShowToast = function (message, type = 'success') {
             const container = document.getElementById('cpm-toast-container');
             if (!container) return;
 
             const toast = document.createElement('div');
-            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-2xl text-xs md:text-sm font-bold text-white border border-white/20 animate-slideInRight transition-all ${
-                type === 'success' ? 'bg-gradient-to-r from-emerald-600 to-teal-600' :
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-2xl text-xs md:text-sm font-bold text-white border border-white/20 animate-slideInRight transition-all ${type === 'success' ? 'bg-gradient-to-r from-emerald-600 to-teal-600' :
                 type === 'error' ? 'bg-gradient-to-r from-rose-600 to-red-600' :
-                'bg-gradient-to-r from-blue-600 to-indigo-600'
+                    'bg-gradient-to-r from-blue-600 to-indigo-600'
             }`;
 
             const icon = type === 'success' ? '🎉' : type === 'error' ? '⚠️' : 'ℹ️';
@@ -889,7 +929,7 @@ function cpm_render_cart_footer_widgets() {
             }, 3000);
         };
 
-        window.cpmAddToCart = function(productTitle, productId = 0, quantity = 1) {
+        window.cpmAddToCart = function (productTitle, productId = 0, quantity = 1) {
             const formData = new FormData();
             formData.append('action', 'cpm_add_to_cart');
             formData.append('security', cpmCartGlobalNonce);
@@ -901,33 +941,33 @@ function cpm_render_cart_footer_widgets() {
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    cpmShowToast(res.data.message, 'success');
-                    const badge = document.getElementById('cpm-cart-badge-count');
-                    if (badge && res.data.cart_count !== undefined) {
-                        badge.innerText = res.data.cart_count;
-                    }
-                } else {
-                    if (res.data && res.data.require_login) {
-                        cpmShowToast(res.data.message, 'error');
-                        if (typeof openCpmAuthModal === 'function') {
-                            openCpmAuthModal('login');
-                        } else {
-                            window.location.href = res.data.redirect_url;
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        cpmShowToast(res.data.message, 'success');
+                        const badge = document.getElementById('cpm-cart-badge-count');
+                        if (badge && res.data.cart_count !== undefined) {
+                            badge.innerText = res.data.cart_count;
                         }
                     } else {
-                        cpmShowToast(res.data.message || 'Lỗi thêm sản phẩm!', 'error');
+                        if (res.data && res.data.require_login) {
+                            cpmShowToast(res.data.message, 'error');
+                            if (typeof openCpmAuthModal === 'function') {
+                                openCpmAuthModal('login');
+                            } else {
+                                window.location.href = res.data.redirect_url;
+                            }
+                        } else {
+                            cpmShowToast(res.data.message || 'Lỗi thêm sản phẩm!', 'error');
+                        }
                     }
-                }
-            })
-            .catch(err => {
-                cpmShowToast('Không thể kết nối đến máy chủ. Vui lòng thử lại!', 'error');
-            });
+                })
+                .catch(err => {
+                    cpmShowToast('Không thể kết nối đến máy chủ. Vui lòng thử lại!', 'error');
+                });
         };
 
-        window.cpmBuyNow = function(productTitle, productId = 0, quantity = 1) {
+        window.cpmBuyNow = function (productTitle, productId = 0, quantity = 1) {
             const reqQty = Math.max(1, parseInt(quantity) || 1);
             const formData = new FormData();
             formData.append('action', 'cpm_add_to_cart');
@@ -944,27 +984,27 @@ function cpm_render_cart_footer_widgets() {
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    const cartUrl = "<?php echo esc_url(home_url('/gio-hang/')); ?>";
-                    window.location.href = cartUrl + '?buy_now=1&product_id=' + (productId || 0);
-                } else {
-                    if (res.data && res.data.require_login) {
-                        cpmShowToast(res.data.message, 'error');
-                        if (typeof openCpmAuthModal === 'function') {
-                            openCpmAuthModal('login');
-                        } else {
-                            window.location.href = res.data.redirect_url;
-                        }
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        const cartUrl = "<?php echo esc_url(home_url('/gio-hang/')); ?>";
+                        window.location.href = cartUrl + '?buy_now=1&product_id=' + (productId || 0);
                     } else {
-                        cpmShowToast(res.data.message || 'Lỗi xử lý Mua ngay!', 'error');
+                        if (res.data && res.data.require_login) {
+                            cpmShowToast(res.data.message, 'error');
+                            if (typeof openCpmAuthModal === 'function') {
+                                openCpmAuthModal('login');
+                            } else {
+                                window.location.href = res.data.redirect_url;
+                            }
+                        } else {
+                            cpmShowToast(res.data.message || 'Lỗi xử lý Mua ngay!', 'error');
+                        }
                     }
-                }
-            })
-            .catch(err => {
-                cpmShowToast('Không thể kết nối máy chủ!', 'error');
-            });
+                })
+                .catch(err => {
+                    cpmShowToast('Không thể kết nối máy chủ!', 'error');
+                });
         };
     </script>
     <?php
@@ -974,7 +1014,8 @@ add_action('wp_footer', 'cpm_render_cart_footer_widgets');
 /**
  * 13. Giao diện Shortcode Giỏ Hàng & Form Thanh Toán SePay VietQR [cpm_cart]
  */
-function cpm_render_cart_shortcode() {
+function cpm_render_cart_shortcode()
+{
     $nonce = wp_create_nonce('cpm_cart_nonce');
     $ajax_url = admin_url('admin-ajax.php');
     $current_user = wp_get_current_user();
@@ -982,19 +1023,23 @@ function cpm_render_cart_shortcode() {
     ob_start();
     ?>
     <div id="cpm-cart-wrapper" class="max-w-[1200px] mx-auto my-8 px-4 font-sans text-slate-800 box-border">
-        <?php if (!is_user_logged_in()) : ?>
+        <?php if (!is_user_logged_in()): ?>
             <!-- Trạng thái chưa đăng nhập -->
             <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 shadow-md max-w-md mx-auto">
-                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <div
+                    class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
                     🔒
                 </div>
                 <h3 class="text-xl font-extrabold text-slate-900 mb-2">Vui lòng đăng nhập</h3>
-                <p class="text-sm text-slate-500 mb-6">Bạn cần đăng nhập tài khoản để xem và quản lý danh sách sản phẩm trong giỏ hàng.</p>
-                <button type="button" onclick="if(typeof openCpmAuthModal==='function'){openCpmAuthModal('login');}else{window.location.href='<?php echo esc_url(wp_login_url(get_permalink())); ?>';}" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all border-none cursor-pointer">
+                <p class="text-sm text-slate-500 mb-6">Bạn cần đăng nhập tài khoản để xem và quản lý danh sách sản phẩm trong
+                    giỏ hàng.</p>
+                <button type="button"
+                    onclick="if(typeof openCpmAuthModal==='function'){openCpmAuthModal('login');}else{window.location.href='<?php echo esc_url(wp_login_url(get_permalink())); ?>';}"
+                    class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all border-none cursor-pointer">
                     🔑 Đăng nhập / Đăng ký ngay
                 </button>
             </div>
-        <?php else : 
+        <?php else:
             global $wpdb;
             $user_id = get_current_user_id();
             $table_name = $wpdb->prefix . 'cpm_cart';
@@ -1004,22 +1049,26 @@ function cpm_render_cart_shortcode() {
                 $user_id
             ));
 
-            if (empty($cart_items)) : ?>
+            if (empty($cart_items)): ?>
                 <!-- Trạng thái Giỏ hàng Trống -->
-                <div id="cpm-cart-empty-state" class="bg-white rounded-2xl p-10 text-center border border-slate-100 shadow-sm max-w-lg mx-auto">
-                    <div class="w-20 h-20 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <div id="cpm-cart-empty-state"
+                    class="bg-white rounded-2xl p-10 text-center border border-slate-100 shadow-sm max-w-lg mx-auto">
+                    <div
+                        class="w-20 h-20 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
                         🛒
                     </div>
                     <h3 class="text-2xl font-black text-slate-900 mb-2">Giỏ hàng của bạn đang trống</h3>
                     <p class="text-sm text-slate-500 mb-6">Hãy khám phá danh sách sản phẩm và lựa chọn những món hàng ưng ý nhé!</p>
-                    <a href="<?php echo esc_url(home_url('/san-pham/')); ?>" class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md transition-all no-underline">
+                    <a href="<?php echo esc_url(home_url('/san-pham/')); ?>"
+                        class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md transition-all no-underline">
                         🛍️ Tiếp tục mua sắm
                     </a>
                 </div>
-            <?php else : ?>
+            <?php else: ?>
                 <!-- Bảng Danh sách Giỏ hàng & Form Đặt Hàng -->
                 <div id="cpm-cart-main-content">
-                    <h1 id="cpm-cart-header-title" class="text-2xl md:text-3xl font-black text-slate-900 mb-6 pb-3 border-b-2 border-slate-200">
+                    <h1 id="cpm-cart-header-title"
+                        class="text-2xl md:text-3xl font-black text-slate-900 mb-6 pb-3 border-b-2 border-slate-200">
                         Giỏ hàng của bạn (<span id="cpm-cart-distinct-count"><?php echo count($cart_items); ?></span> sản phẩm)
                     </h1>
 
@@ -1027,18 +1076,22 @@ function cpm_render_cart_shortcode() {
                         <!-- Cột danh sách sản phẩm (2/3) -->
                         <div id="cpm-cart-items-list" class="lg:col-span-2 space-y-4">
                             <!-- Thanh Chọn tất cả sản phẩm -->
-                            <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex items-center justify-between">
+                            <div
+                                class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex items-center justify-between">
                                 <label class="flex items-center gap-3 text-sm font-bold text-slate-800 cursor-pointer">
-                                    <input type="checkbox" id="cpm-cart-select-all" checked onchange="cpmToggleCartSelectAll(this.checked)" class="w-5 h-5 text-blue-600 rounded cursor-pointer accent-blue-600" />
-                                    <span>Chọn tất cả (<span id="cpm-selected-items-count"><?php echo count($cart_items); ?></span> / <?php echo count($cart_items); ?> sản phẩm)</span>
+                                    <input type="checkbox" id="cpm-cart-select-all" checked
+                                        onchange="cpmToggleCartSelectAll(this.checked)"
+                                        class="w-5 h-5 text-blue-600 rounded cursor-pointer accent-blue-600" />
+                                    <span>Chọn tất cả (<span id="cpm-selected-items-count"><?php echo count($cart_items); ?></span>
+                                        / <?php echo count($cart_items); ?> sản phẩm)</span>
                                 </label>
                             </div>
 
-                            <?php 
+                            <?php
                             $grand_total = 0;
                             $default_placeholder_svg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f1f5f9"/><text x="50%" y="55%" font-size="12" fill="%2394a3b8" text-anchor="middle">No Image</text></svg>';
 
-                            foreach ($cart_items as $item) : 
+                            foreach ($cart_items as $item):
                                 $post_id = $item->product_id;
                                 $product = get_post($post_id);
                                 if (!$product || $product->post_status !== 'publish') {
@@ -1062,18 +1115,25 @@ function cpm_render_cart_shortcode() {
                                 } else {
                                     $img_src = $default_placeholder_svg;
                                 }
-                            ?>
-                                <div id="cpm-cart-row-<?php echo $item->id; ?>" class="bg-white rounded-2xl p-4 md:p-5 border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 transition-all hover:shadow-md">
+                                ?>
+                                <div id="cpm-cart-row-<?php echo $item->id; ?>"
+                                    class="bg-white rounded-2xl p-4 md:p-5 border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 transition-all hover:shadow-md">
                                     <!-- Checkbox chọn sản phẩm & Ảnh & Tên sản phẩm -->
                                     <div class="flex items-center gap-3 w-full sm:w-auto">
-                                        <input type="checkbox" class="cpm-cart-item-select w-5 h-5 text-blue-600 rounded cursor-pointer accent-blue-600 flex-shrink-0" data-cart-id="<?php echo $item->id; ?>" data-product-id="<?php echo $post_id; ?>" data-subtotal="<?php echo $item_subtotal; ?>" data-qty="<?php echo $item->quantity; ?>" checked onchange="cpmRecalculateSelectedCartTotals()" />
-                                        
-                                        <img src="<?php echo $img_src; ?>" alt="<?php echo esc_attr($title); ?>" class="w-16 h-16 md:w-20 md:h-20 object-contain rounded-xl bg-slate-50 border border-slate-200 p-2 flex-shrink-0" />
+                                        <input type="checkbox"
+                                            class="cpm-cart-item-select w-5 h-5 text-blue-600 rounded cursor-pointer accent-blue-600 flex-shrink-0"
+                                            data-cart-id="<?php echo $item->id; ?>" data-product-id="<?php echo $post_id; ?>"
+                                            data-subtotal="<?php echo $item_subtotal; ?>" data-qty="<?php echo $item->quantity; ?>"
+                                            checked onchange="cpmRecalculateSelectedCartTotals()" />
+
+                                        <img src="<?php echo $img_src; ?>" alt="<?php echo esc_attr($title); ?>"
+                                            class="w-16 h-16 md:w-20 md:h-20 object-contain rounded-xl bg-slate-50 border border-slate-200 p-2 flex-shrink-0" />
                                         <div>
-                                            <a href="<?php echo get_permalink($post_id); ?>" class="text-sm md:text-base font-bold text-slate-900 hover:text-blue-600 transition-colors no-underline block line-clamp-2">
+                                            <a href="<?php echo get_permalink($post_id); ?>"
+                                                class="text-sm md:text-base font-bold text-slate-900 hover:text-blue-600 transition-colors no-underline block line-clamp-2">
                                                 <?php echo esc_html($title); ?>
                                             </a>
-                                            <?php if (!empty($sku)) : ?>
+                                            <?php if (!empty($sku)): ?>
                                                 <span class="text-xs text-slate-400 font-semibold">SKU: <?php echo esc_html($sku); ?></span>
                                             <?php endif; ?>
                                             <p class="text-sm font-extrabold text-blue-600 mt-1 sm:hidden">
@@ -1092,24 +1152,32 @@ function cpm_render_cart_shortcode() {
 
                                     <!-- Bộ tăng giảm số lượng -->
                                     <div class="flex items-center border border-slate-300 rounded-xl overflow-hidden bg-slate-50">
-                                        <button type="button" onclick="cpmChangeCartQty(<?php echo $item->id; ?>, -1)" class="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-200 font-bold border-none cursor-pointer">
+                                        <button type="button" onclick="cpmChangeCartQty(<?php echo $item->id; ?>, -1)"
+                                            class="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-200 font-bold border-none cursor-pointer">
                                             -
                                         </button>
-                                        <input type="number" id="cpm-qty-input-<?php echo $item->id; ?>" min="1" value="<?php echo $item->quantity; ?>" onchange="cpmSetCartQty(<?php echo $item->id; ?>, this.value)" class="w-12 text-center text-sm font-bold bg-transparent border-none outline-none" />
-                                        <button type="button" onclick="cpmChangeCartQty(<?php echo $item->id; ?>, 1)" class="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-200 font-bold border-none cursor-pointer">
+                                        <input type="number" id="cpm-qty-input-<?php echo $item->id; ?>" min="1"
+                                            value="<?php echo $item->quantity; ?>"
+                                            onchange="cpmSetCartQty(<?php echo $item->id; ?>, this.value)"
+                                            class="w-12 text-center text-sm font-bold bg-transparent border-none outline-none" />
+                                        <button type="button" onclick="cpmChangeCartQty(<?php echo $item->id; ?>, 1)"
+                                            class="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-200 font-bold border-none cursor-pointer">
                                             +
                                         </button>
                                     </div>
 
                                     <!-- Thành tiền & Nút Xóa -->
-                                    <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                                    <div
+                                        class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
                                         <div class="text-right">
                                             <span class="text-xs text-slate-400 block font-semibold sm:hidden">Thành tiền</span>
-                                            <span id="cpm-item-subtotal-<?php echo $item->id; ?>" class="text-base font-black text-red-600">
+                                            <span id="cpm-item-subtotal-<?php echo $item->id; ?>"
+                                                class="text-base font-black text-red-600">
                                                 <?php echo number_format($item_subtotal, 0, ',', '.'); ?> đ
                                             </span>
                                         </div>
-                                        <button type="button" onclick="cpmRemoveCartItem(<?php echo $item->id; ?>)" title="Xóa sản phẩm" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-100 text-slate-400 hover:text-red-600 flex items-center justify-center transition-colors border-none cursor-pointer">
+                                        <button type="button" onclick="cpmRemoveCartItem(<?php echo $item->id; ?>)" title="Xóa sản phẩm"
+                                            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-100 text-slate-400 hover:text-red-600 flex items-center justify-center transition-colors border-none cursor-pointer">
                                             ✕
                                         </button>
                                     </div>
@@ -1119,31 +1187,41 @@ function cpm_render_cart_shortcode() {
 
                         <!-- Cột Thông Tin Giao Hàng & Đặt Hàng Thanh Toán SePay (1/3) -->
                         <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-md sticky top-6">
-                            <h3 class="text-lg font-black text-slate-900 mb-4 pb-3 border-b border-slate-100">Thông tin đặt hàng</h3>
-                            
+                            <h3 class="text-lg font-black text-slate-900 mb-4 pb-3 border-b border-slate-100">Thông tin đặt hàng
+                            </h3>
+
                             <form id="cpmCheckoutForm" onsubmit="handleCpmCheckoutSubmit(event)">
                                 <div class="space-y-3 text-xs mb-5">
                                     <div>
                                         <label class="block font-bold text-slate-700 mb-1">Họ và Tên người nhận *</label>
-                                        <input type="text" id="cpmOrderName" required value="<?php echo esc_attr($current_user->display_name); ?>" placeholder="Nguyễn Văn A" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold outline-none focus:border-blue-500 box-border" />
+                                        <input type="text" id="cpmOrderName" required
+                                            value="<?php echo esc_attr($current_user->display_name); ?>" placeholder="Nguyễn Văn A"
+                                            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold outline-none focus:border-blue-500 box-border" />
                                     </div>
                                     <div>
                                         <label class="block font-bold text-slate-700 mb-1">Số điện thoại giao hàng *</label>
-                                        <input type="tel" id="cpmOrderPhone" required placeholder="0987654321" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold outline-none focus:border-blue-500 box-border" />
+                                        <input type="tel" id="cpmOrderPhone" required placeholder="0987654321"
+                                            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold outline-none focus:border-blue-500 box-border" />
                                     </div>
                                     <div>
                                         <label class="block font-bold text-slate-700 mb-1">Địa chỉ nhận hàng *</label>
-                                        <textarea id="cpmOrderAddress" required rows="2" placeholder="Số nhà, Đường, Phường/Xã, Quận/Huyện..." class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold outline-none focus:border-blue-500 box-border"></textarea>
+                                        <textarea id="cpmOrderAddress" required rows="2"
+                                            placeholder="Số nhà, Đường, Phường/Xã, Quận/Huyện..."
+                                            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold outline-none focus:border-blue-500 box-border"></textarea>
                                     </div>
                                     <div>
                                         <label class="block font-bold text-slate-700 mb-1">Phương thức thanh toán *</label>
                                         <div class="space-y-2 pt-1">
-                                            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-blue-200 bg-blue-50/50 cursor-pointer font-bold text-blue-900">
-                                                <input type="radio" name="cpmPaymentMethod" value="vietqr" checked class="text-blue-600 focus:ring-blue-500" />
+                                            <label
+                                                class="flex items-center gap-2 p-2.5 rounded-xl border border-blue-200 bg-blue-50/50 cursor-pointer font-bold text-blue-900">
+                                                <input type="radio" name="cpmPaymentMethod" value="vietqr" checked
+                                                    class="text-blue-600 focus:ring-blue-500" />
                                                 <span>📲 Quét mã SePay VietQR (Tự Động)</span>
                                             </label>
-                                            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer font-bold text-slate-700">
-                                                <input type="radio" name="cpmPaymentMethod" value="cod" class="text-blue-600 focus:ring-blue-500" />
+                                            <label
+                                                class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer font-bold text-slate-700">
+                                                <input type="radio" name="cpmPaymentMethod" value="cod"
+                                                    class="text-blue-600 focus:ring-blue-500" />
                                                 <span>🚚 Thanh toán khi nhận hàng (COD)</span>
                                             </label>
                                         </div>
@@ -1152,23 +1230,31 @@ function cpm_render_cart_shortcode() {
 
                                 <div class="space-y-2 mb-5 text-xs">
                                     <div class="flex justify-between text-slate-600">
-                                        <span>Tạm tính (<span id="cpm-summary-item-count"><?php echo count($cart_items); ?></span> món):</span>
-                                        <span id="cpm-summary-subtotal" class="font-bold text-slate-800"><?php echo number_format($grand_total, 0, ',', '.'); ?> đ</span>
+                                        <span>Tạm tính (<span id="cpm-summary-item-count"><?php echo count($cart_items); ?></span>
+                                            món):</span>
+                                        <span id="cpm-summary-subtotal"
+                                            class="font-bold text-slate-800"><?php echo number_format($grand_total, 0, ',', '.'); ?>
+                                            đ</span>
                                     </div>
                                     <div class="flex justify-between text-slate-600">
                                         <span>Phí vận chuyển:</span>
                                         <span class="font-bold text-emerald-600">Miễn phí 🚚</span>
                                     </div>
-                                    <div class="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-slate-100">
+                                    <div
+                                        class="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-slate-100">
                                         <span>Tổng thanh toán:</span>
-                                        <span id="cpm-summary-grand-total" class="text-lg text-red-600"><?php echo number_format($grand_total, 0, ',', '.'); ?> đ</span>
+                                        <span id="cpm-summary-grand-total"
+                                            class="text-lg text-red-600"><?php echo number_format($grand_total, 0, ',', '.'); ?>
+                                            đ</span>
                                     </div>
                                 </div>
 
-                                <button type="submit" id="cpmSubmitCheckoutBtn" class="w-full py-4 px-5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm md:text-base rounded-2xl shadow-xl shadow-teal-500/25 hover:shadow-2xl hover:shadow-teal-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 border-none cursor-pointer flex items-center justify-center gap-2 mb-3">
+                                <button type="submit" id="cpmSubmitCheckoutBtn"
+                                    class="w-full py-4 px-5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm md:text-base rounded-2xl shadow-xl shadow-teal-500/25 hover:shadow-2xl hover:shadow-teal-500/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 border-none cursor-pointer flex items-center justify-center gap-2 mb-3">
                                     <span>🚀 Thanh toán SePay VietQR Ngay</span>
                                 </button>
-                                <a href="<?php echo esc_url(home_url('/san-pham/')); ?>" class="block text-center text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors no-underline">
+                                <a href="<?php echo esc_url(home_url('/san-pham/')); ?>"
+                                    class="block text-center text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors no-underline">
                                     ← Chọn thêm sản phẩm khác
                                 </a>
                             </form>
@@ -1180,9 +1266,12 @@ function cpm_render_cart_shortcode() {
     </div>
 
     <script>
-        const cpmCartTableAjaxUrl = "<?php echo esc_url($ajax_url); ?>";
-        const cpmCartTableNonce = "<?php echo esc_js($nonce); ?>";
-        const cpmUserEmail = "<?php echo esc_js($current_user->user_email); ?>";
+        window.cpmCartTableAjaxUrl = window.cpmCartTableAjaxUrl || "<?php echo esc_url($ajax_url); ?>";
+        window.cpmCartTableNonce = window.cpmCartTableNonce || "<?php echo esc_js($nonce); ?>";
+        window.cpmUserEmail = window.cpmUserEmail || "<?php echo esc_js($current_user->user_email); ?>";
+        var cpmCartTableAjaxUrl = window.cpmCartTableAjaxUrl;
+        var cpmCartTableNonce = window.cpmCartTableNonce;
+        var cpmUserEmail = window.cpmUserEmail;
 
         function handleCpmCheckoutSubmit(e) {
             e.preventDefault();
@@ -1219,50 +1308,50 @@ function cpm_render_cart_shortcode() {
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(res => {
-                btn.disabled = false;
-                btn.innerHTML = '🚀 Thanh toán SePay VietQR Ngay';
+                .then(res => res.json())
+                .then(res => {
+                    btn.disabled = false;
+                    btn.innerHTML = '🚀 Thanh toán SePay VietQR Ngay';
 
-                if (res.success) {
-                    cpmRedirectInvoiceUrl = res.data.invoice_url;
+                    if (res.success) {
+                        cpmRedirectInvoiceUrl = res.data.invoice_url;
 
-                    if (res.data.payment_method === 'vietqr') {
-                        document.getElementById('cpmQrOrderCode').innerText = res.data.order_code;
-                        document.getElementById('cpmQrImage').src = res.data.vietqr_url;
-                        document.getElementById('cpmBankName').innerText = res.data.bank_name;
-                        document.getElementById('cpmAccountNo').innerText = res.data.account_no;
-                        document.getElementById('cpmAccountName').innerText = res.data.account_name;
-                        document.getElementById('cpmQrTotalAmount').innerText = res.data.total_amount_formatted;
-                        document.getElementById('cpmQrMemo').innerText = res.data.qr_memo;
+                        if (res.data.payment_method === 'vietqr') {
+                            document.getElementById('cpmQrOrderCode').innerText = res.data.order_code;
+                            document.getElementById('cpmQrImage').src = res.data.vietqr_url;
+                            document.getElementById('cpmBankName').innerText = res.data.bank_name;
+                            document.getElementById('cpmAccountNo').innerText = res.data.account_no;
+                            document.getElementById('cpmAccountName').innerText = res.data.account_name;
+                            document.getElementById('cpmQrTotalAmount').innerText = res.data.total_amount_formatted;
+                            document.getElementById('cpmQrMemo').innerText = res.data.qr_memo;
 
-                        const modal = document.getElementById('cpmVietQRModal');
-                        if (modal) modal.style.display = 'flex';
+                            const modal = document.getElementById('cpmVietQRModal');
+                            if (modal) modal.style.display = 'flex';
 
-                        if (typeof cpmStartSepayPolling === 'function') {
-                            cpmStartSepayPolling(res.data.order_code, res.data.invoice_url);
+                            if (typeof cpmStartSepayPolling === 'function') {
+                                cpmStartSepayPolling(res.data.order_code, res.data.invoice_url);
+                            }
+                        } else {
+                            if (typeof cpmShowToast === 'function') {
+                                cpmShowToast('🎉 Đặt hàng thành công! Đang chuyển đến Hóa đơn...', 'success');
+                            }
+                            setTimeout(() => {
+                                window.location.href = res.data.invoice_url;
+                            }, 800);
                         }
                     } else {
                         if (typeof cpmShowToast === 'function') {
-                            cpmShowToast('🎉 Đặt hàng thành công! Đang chuyển đến Hóa đơn...', 'success');
+                            cpmShowToast(res.data.message || 'Lỗi đặt hàng!', 'error');
                         }
-                        setTimeout(() => {
-                            window.location.href = res.data.invoice_url;
-                        }, 800);
                     }
-                } else {
+                })
+                .catch(err => {
+                    btn.disabled = false;
+                    btn.innerHTML = '🚀 Thanh toán SePay VietQR Ngay';
                     if (typeof cpmShowToast === 'function') {
-                        cpmShowToast(res.data.message || 'Lỗi đặt hàng!', 'error');
+                        cpmShowToast('Không thể kết nối đến máy chủ!', 'error');
                     }
-                }
-            })
-            .catch(err => {
-                btn.disabled = false;
-                btn.innerHTML = '🚀 Thanh toán SePay VietQR Ngay';
-                if (typeof cpmShowToast === 'function') {
-                    cpmShowToast('Không thể kết nối đến máy chủ!', 'error');
-                }
-            });
+                });
         }
 
         function cpmChangeCartQty(cartId, delta) {
@@ -1300,44 +1389,44 @@ function cpm_render_cart_shortcode() {
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    if (res.data.is_empty) {
-                        cpmRenderEmptyCartUI();
-                    } else if (res.data.is_removed) {
-                        const row = document.getElementById('cpm-cart-row-' + cartId);
-                        if (row) row.remove();
-                        cpmUpdateCartDOMTotals(res.data);
-                    } else {
-                        if (input) input.value = res.data.quantity;
-                        const subtotalEl = document.getElementById('cpm-item-subtotal-' + cartId);
-                        if (subtotalEl) subtotalEl.innerText = res.data.item_subtotal_formatted;
-                        
-                        const cb = document.querySelector(`.cpm-cart-item-select[data-cart-id="${cartId}"]`);
-                        if (cb) {
-                            cb.dataset.qty = res.data.quantity;
-                            if (res.data.item_subtotal_raw !== undefined) {
-                                cb.dataset.subtotal = res.data.item_subtotal_raw;
-                            }
-                        }
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        if (res.data.is_empty) {
+                            cpmRenderEmptyCartUI();
+                        } else if (res.data.is_removed) {
+                            const row = document.getElementById('cpm-cart-row-' + cartId);
+                            if (row) row.remove();
+                            cpmUpdateCartDOMTotals(res.data);
+                        } else {
+                            if (input) input.value = res.data.quantity;
+                            const subtotalEl = document.getElementById('cpm-item-subtotal-' + cartId);
+                            if (subtotalEl) subtotalEl.innerText = res.data.item_subtotal_formatted;
 
-                        cpmUpdateCartDOMTotals(res.data);
+                            const cb = document.querySelector(`.cpm-cart-item-select[data-cart-id="${cartId}"]`);
+                            if (cb) {
+                                cb.dataset.qty = res.data.quantity;
+                                if (res.data.item_subtotal_raw !== undefined) {
+                                    cb.dataset.subtotal = res.data.item_subtotal_raw;
+                                }
+                            }
+
+                            cpmUpdateCartDOMTotals(res.data);
+                        }
+                        if (typeof cpmShowToast === 'function') {
+                            cpmShowToast(res.data.message, 'success');
+                        }
+                    } else {
+                        if (typeof cpmShowToast === 'function') {
+                            cpmShowToast(res.data.message || 'Lỗi cập nhật số lượng!', 'error');
+                        }
                     }
+                })
+                .catch(err => {
                     if (typeof cpmShowToast === 'function') {
-                        cpmShowToast(res.data.message, 'success');
+                        cpmShowToast('Không thể kết nối đến máy chủ!', 'error');
                     }
-                } else {
-                    if (typeof cpmShowToast === 'function') {
-                        cpmShowToast(res.data.message || 'Lỗi cập nhật số lượng!', 'error');
-                    }
-                }
-            })
-            .catch(err => {
-                if (typeof cpmShowToast === 'function') {
-                    cpmShowToast('Không thể kết nối đến máy chủ!', 'error');
-                }
-            });
+                });
         }
 
         function cpmUpdateCartDOMTotals(data) {
@@ -1350,7 +1439,7 @@ function cpm_render_cart_shortcode() {
             cpmRecalculateSelectedCartTotals();
         }
 
-        window.cpmRecalculateSelectedCartTotals = function() {
+        window.cpmRecalculateSelectedCartTotals = function () {
             const checkboxes = document.querySelectorAll('.cpm-cart-item-select');
             const checkedBoxes = document.querySelectorAll('.cpm-cart-item-select:checked');
             const selectAllCb = document.getElementById('cpm-cart-select-all');
@@ -1394,7 +1483,7 @@ function cpm_render_cart_shortcode() {
             }
         };
 
-        window.cpmToggleCartSelectAll = function(isChecked) {
+        window.cpmToggleCartSelectAll = function (isChecked) {
             const checkboxes = document.querySelectorAll('.cpm-cart-item-select');
             checkboxes.forEach(cb => {
                 cb.checked = isChecked;
@@ -1402,7 +1491,7 @@ function cpm_render_cart_shortcode() {
             cpmRecalculateSelectedCartTotals();
         };
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('buy_now') === '1' && urlParams.get('product_id')) {
                 const targetProdId = urlParams.get('product_id');

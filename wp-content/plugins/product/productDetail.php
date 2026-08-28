@@ -65,8 +65,12 @@ function cpm_render_single_product_detail($content = '')
     $display_desc = !empty(trim(strip_tags($content))) ? $content : $raw_content;
 
     ob_start();
-    ?>
-    <style>
+    $theme_template = locate_template('template-parts/cpm/product-detail.php');
+    if ($theme_template) {
+        include $theme_template;
+    } else {
+        ?>
+        <style>
         /* Container Căn Giữa 1200px Chuẩn cho Sản Phẩm */
         .cpm-main-container {
             max-width: 1200px !important;
@@ -275,6 +279,7 @@ function cpm_render_single_product_detail($content = '')
         <?php endif; ?>
     </div>
     <?php
+    } // end theme fallback
     return ob_get_clean();
 }
 

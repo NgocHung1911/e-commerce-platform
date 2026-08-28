@@ -14,8 +14,12 @@ if (!function_exists('cpm_render_policy_page_shortcode')) {
      */
     function cpm_render_policy_page_shortcode() {
         ob_start();
-        ?>
-        <style id="cpm-policy-page-styles">
+        $theme_template = locate_template('template-parts/cpm/policy-page.php');
+        if ($theme_template) {
+            include $theme_template;
+        } else {
+            ?>
+            <style id="cpm-policy-page-styles">
             .wp-block-group.alignfull,
             .entry-content > .wp-block-group,
             main#content {
@@ -176,6 +180,7 @@ if (!function_exists('cpm_render_policy_page_shortcode')) {
             </div>
         </div>
         <?php
+        } // end theme fallback
         return ob_get_clean();
     }
 }
