@@ -1,11 +1,14 @@
 <?php
 /**
- * Sub-module Trang Chính Sách Hệ Thống (System Policy Page)
- * File: policyPage.php
+ * Plugin Name: Trang Chính Sách Hệ Thống (Policy Manager)
+ * Plugin URI: https://example.com/
+ * Description: Plugin quản lý các Trang Chính sách hệ thống, Điều khoản dịch vụ và Chính sách bảo mật.
+ * Version: 1.0.0
+ * Author: Antigravity
  */
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
+    exit;
 }
 
 if (!function_exists('cpm_render_policy_page_shortcode')) {
@@ -14,8 +17,12 @@ if (!function_exists('cpm_render_policy_page_shortcode')) {
      */
     function cpm_render_policy_page_shortcode() {
         ob_start();
-        ?>
-        <style id="cpm-policy-page-styles">
+        $theme_template = locate_template('template-parts/cpm/policy-page.php');
+        if ($theme_template) {
+            include $theme_template;
+        } else {
+            ?>
+            <style id="cpm-policy-page-styles">
             .wp-block-group.alignfull,
             .entry-content > .wp-block-group,
             main#content {
@@ -176,6 +183,7 @@ if (!function_exists('cpm_render_policy_page_shortcode')) {
             </div>
         </div>
         <?php
+        } // end theme fallback
         return ob_get_clean();
     }
 }

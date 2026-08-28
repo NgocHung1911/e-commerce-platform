@@ -1,6 +1,10 @@
 <?php
 /**
- * Sub-module Quản lý Hóa Đơn & Lịch Sử Đơn Hàng
+ * Plugin Name: Quản lý Hóa Đơn & Lịch Sử Đơn Hàng (Bill Manager)
+ * Plugin URI: https://example.com/
+ * Description: Plugin quản lý Chi tiết Hóa Đơn bán hàng và Lịch sử tất cả đơn hàng cho khách hàng.
+ * Version: 1.0.0
+ * Author: Antigravity
  */
 
 if (!defined('ABSPATH')) {

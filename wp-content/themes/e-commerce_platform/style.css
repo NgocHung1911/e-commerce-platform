@@ -1,0 +1,377 @@
+/*
+Theme Name: E-Commerce Platform Theme
+Theme URI: https://example.com/e-commerce-platform
+Author: Antigravity
+Author URI: https://example.com/
+Description: Theme thương mại điện tử tích hợp thanh toán SePay VietQR tự động, quản lý đơn hàng & hóa đơn chuyên nghiệp.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: e-commerce_platform
+*/
+
+/* Reset & Base Layout */
+html,
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background-color: #f8fafc;
+}
+
+/* Đảm bảo WordPress Admin Bar luôn cố định sát lề trên 0px */
+#wpadminbar {
+    position: fixed !important;
+    top: 0 !important;
+    z-index: 999999 !important;
+}
+
+/* Tắt margin-top tự động của WordPress để Admin Bar và Header hoạt động độc lập */
+html.admin-bar,
+body.admin-bar {
+    margin-top: 0 !important;
+}
+
+/* Khung Header Sticky dán sát lề trên khi chưa đăng nhập */
+header.wp-block-template-part,
+.wp-block-template-part-header,
+.cpm-main-header {
+    position: sticky !important;
+    top: 0;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    box-sizing: border-box !important;
+}
+
+/* Khi đã đăng nhập: Đẩy riêng Header xuống 32px độc lập (ngay bên dưới Admin Bar) */
+body.admin-bar .cpm-main-header,
+html.admin-bar .cpm-main-header,
+body.admin-bar header.wp-block-template-part,
+html.admin-bar header.wp-block-template-part {
+    top: 0px !important;
+}
+
+@media screen and (max-width: 782px) {
+    body.admin-bar .cpm-main-header,
+    html.admin-bar .cpm-main-header,
+    body.admin-bar header.wp-block-template-part,
+    html.admin-bar header.wp-block-template-part {
+        top: 46px !important;
+    }
+}
+
+/* =========================================
+   EP TẤT CẢ TRANG VÀO CONTAINER NẰM GIỮA (MAX-WIDTH 1200PX)
+========================================= */
+
+main#content,
+.entry-content,
+.site-content,
+.wp-block-post-content,
+.max-w-1200,
+.cpm-page-container,
+#cpm-cart-wrapper,
+#cpm-invoice-print-area,
+.cpm-main-container {
+    max-width: 1200px !important;
+    width: 90% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* Lưới Sản Phẩm Căn Trái Từ Cột 1 */
+.cpm-products-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 24px !important;
+    width: 100% !important;
+    margin: 24px 0 !important;
+    box-sizing: border-box !important;
+}
+
+.cpm-products-grid > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 1024px) {
+    .cpm-products-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 768px) {
+    .cpm-products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 480px) {
+    .cpm-products-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+}
+
+/* =========================================
+   AUTH MODAL POPUP CĂN GIỮA TUYỆT ĐỐI 100%
+========================================= */
+
+#cpmAuthModal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(15, 23, 42, 0.65) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    z-index: 999999 !important;
+    display: none;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+#cpmAuthModal[style*="display: flex"],
+#cpmAuthModal[style*="display: block"],
+#cpmAuthModal.active {
+    display: flex !important;
+}
+
+#cpmAuthModal > div {
+    margin: auto !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
+    border-radius: 20px !important;
+    position: relative !important;
+}
+
+/* Custom Scrollbar cho Modal */
+#cpmAuthModal > div::-webkit-scrollbar {
+    width: 6px;
+}
+#cpmAuthModal > div::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+}
+
+/* ================================
+   FOOTER STYLES
+================================ */
+
+.footer-section {
+    width: 100%;
+    background: #111827 !important;
+    color: #ffffff !important;
+    padding: 60px 0 25px;
+    margin: 0 !important;
+}
+
+.footer-section > .wp-block-columns,
+.footer-section > .footer-boxes,
+.footer-section > .footer-bottom {
+    width: 85%;
+    max-width: 1200px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.footer-boxes {
+    display: grid !important;
+    grid-template-columns: 1.7fr 1fr 1fr;
+    gap: 70px;
+    margin-bottom: 50px !important;
+}
+
+.footer-boxes .wp-block-column {
+    margin: 0 !important;
+}
+
+.footer-title {
+    margin: 0 0 18px;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: #ffffff !important;
+    letter-spacing: -0.3px;
+}
+
+.footer-description {
+    max-width: 430px;
+    margin: 0 0 25px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #cbd5e1 !important;
+}
+
+.footer-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.footer-contact p {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #cbd5e1 !important;
+}
+
+.footer-contact p span {
+    width: 22px;
+    flex-shrink: 0;
+}
+
+.footer-heading {
+    position: relative;
+    margin: 4px 0 25px;
+    padding-bottom: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff !important;
+}
+
+.footer-heading::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 35px;
+    height: 3px;
+    border-radius: 10px;
+    background: #f97316;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.footer-links li {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.footer-links a {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: fit-content;
+    text-decoration: none !important;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #cbd5e1 !important;
+    transition: all 0.25s ease;
+}
+
+.footer-links a span {
+    font-size: 14px;
+    transition: transform 0.25s ease;
+}
+
+.footer-links a:hover {
+    color: #f97316 !important;
+    transform: translateX(5px);
+}
+
+.footer-links a:hover span {
+    transform: scale(1.1);
+}
+
+.footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.footer-bottom p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #94a3b8 !important;
+}
+
+.footer-bottom strong {
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.footer-payment {
+    text-align: right;
+}
+
+@media (max-width: 900px) {
+    .footer-boxes {
+        grid-template-columns: 1fr 1fr;
+        gap: 45px;
+    }
+    .footer-brand {
+        grid-column: 1 / -1;
+    }
+    .footer-description {
+        max-width: 650px;
+    }
+}
+
+@media (max-width: 600px) {
+    .footer-section {
+        padding: 45px 0 20px;
+    }
+    .footer-section > .wp-block-columns,
+    .footer-section > .footer-boxes,
+    .footer-section > .footer-bottom {
+        width: 90%;
+    }
+    .footer-boxes {
+        display: flex !important;
+        flex-direction: column;
+        gap: 35px;
+        margin-bottom: 35px !important;
+    }
+    .footer-title {
+        font-size: 22px;
+    }
+    .footer-heading {
+        margin-bottom: 18px;
+    }
+    .footer-description {
+        font-size: 13px;
+    }
+    .footer-links {
+        gap: 12px;
+    }
+    .footer-links a {
+        font-size: 13px;
+    }
+    .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .footer-payment {
+        text-align: left;
+    }
+}

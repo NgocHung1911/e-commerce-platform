@@ -1,11 +1,14 @@
 <?php
 /**
- * Sub-module Trang Liên Hệ (Contact Us Page)
- * File: contactPage.php (Module Plugin Contact)
+ * Plugin Name: Trang Liên Hệ & Google Maps (Contact Manager)
+ * Plugin URI: https://example.com/
+ * Description: Plugin quản lý Trang Liên Hệ, bản đồ Google Maps ghim vị trí và form liên hệ nhanh.
+ * Version: 1.0.0
+ * Author: Antigravity
  */
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly.
+    exit;
 }
 
 if (!function_exists('cpm_render_contact_page_shortcode')) {
@@ -19,8 +22,12 @@ function cpm_render_contact_page_shortcode() {
     $user_email = is_user_logged_in() ? $current_user->user_email : '';
 
     ob_start();
-    ?>
-    <style id="cpm-contact-page-styles">
+    $theme_template = locate_template('template-parts/cpm/contact-page.php');
+    if ($theme_template) {
+        include $theme_template;
+    } else {
+        ?>
+        <style id="cpm-contact-page-styles">
         /* Đảm bảo khung container 1200px được rộng tối đa không bị ép 600px của WordPress */
         .wp-block-group.alignfull,
         .entry-content > .wp-block-group,
@@ -259,6 +266,7 @@ function cpm_render_contact_page_shortcode() {
         }
     </script>
     <?php
+    } // end theme fallback
     return ob_get_clean();
 }
 }
